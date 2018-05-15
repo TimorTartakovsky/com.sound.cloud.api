@@ -16,13 +16,13 @@ public class User {
     private String uri;
     private String userName;
     private String permalink;
-    private Timestamp lastModified;
+    private String lastModified;
     @ManyToMany(mappedBy = "users")
     private Set<Track> tracks = new HashSet<>();
 
     public User() {}
 
-    public User(String avatarUrl, String kind, String permalinkUrl, String uri, String userName, String permalink, Timestamp lastModified) {
+    public User(String avatarUrl, String kind, String permalinkUrl, String uri, String userName, String permalink, String lastModified) {
         this.avatarUrl = avatarUrl;
         this.kind = kind;
         this.permalinkUrl = permalinkUrl;
@@ -101,11 +101,11 @@ public class User {
         this.permalink = permalink;
     }
 
-    public Timestamp getLastModified() {
+    public String getLastModified() {
         return lastModified;
     }
 
-    public void setLastModified(Timestamp lastModified) {
+    public void setLastModified(String lastModified) {
         this.lastModified = lastModified;
     }
 
