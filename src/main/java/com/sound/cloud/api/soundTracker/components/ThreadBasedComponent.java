@@ -3,8 +3,10 @@ package com.sound.cloud.api.soundTracker.components;
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
 import com.sound.cloud.api.soundTracker.interfaces.ISoundCloudApiIntegration;
+import com.sound.cloud.api.soundTracker.model.SearchQuery;
 import com.sound.cloud.api.soundTracker.model.Track;
 import com.sound.cloud.api.soundTracker.model.User;
+import com.sound.cloud.api.soundTracker.repositories.SearchQueryRepository;
 import com.sound.cloud.api.soundTracker.repositories.TrackRepository;
 import com.sound.cloud.api.soundTracker.repositories.UserRepository;
 import com.sound.cloud.api.soundTracker.services.TracksRuntimeStorage;
@@ -15,6 +17,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 
 @Component
@@ -31,6 +34,9 @@ public class ThreadBasedComponent implements Runnable, ISoundCloudApiIntegration
 
     @Autowired
     private TracksRuntimeStorage tracksRuntimeStorage;
+
+    @Autowired
+    private SearchQueryRepository searchQueryRepository;
 
     private String trackName;
 
@@ -62,8 +68,10 @@ public class ThreadBasedComponent implements Runnable, ISoundCloudApiIntegration
     @Override
     public ArrayList<LinkedTreeMap<String, String>> initTracks() {
         RestTemplate restTemplate = new RestTemplate();
-        String result;
-        result = restTemplate.getForObject(BASE_SOUND_CLOUD_URL + TRACKS + this.trackName + LIMIT + CLIENT_ID, String.class);
+        String url = BASE_SOUND_CLOUD_URL + TRACKS + this.trackName + LIMIT + CLIENT_ID;
+        String result = restTemplate.getForObject(url, String.class);
+        SearchQuery searchQuesry = new SearchQuery(url, new Timestamp(System.currentTimeMillis()));
+        this.searchQueryRepository.save(searchQuesry);
         Gson googleJson = new Gson();
         ArrayList javaArrayListFromGSON = (ArrayList<LinkedTreeMap<String, String>>) googleJson.fromJson(result, ArrayList.class);
         return javaArrayListFromGSON;

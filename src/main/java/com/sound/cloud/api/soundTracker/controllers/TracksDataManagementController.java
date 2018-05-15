@@ -1,6 +1,5 @@
 package com.sound.cloud.api.soundTracker.controllers;
 
-import com.sound.cloud.api.soundTracker.components.ThreadBasedComponent;
 import com.sound.cloud.api.soundTracker.pojos.TrackPojo;
 import com.sound.cloud.api.soundTracker.model.Track;
 import com.sound.cloud.api.soundTracker.services.TrackRequestService;
@@ -24,6 +23,18 @@ public class TracksDataManagementController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TracksDataManagementController.class);
 
+
+    @DeleteMapping(value = "/api/deleteTrack/id/{id}")
+    public ResponseEntity<Long> deleteTrackByID(@PathVariable Long  id) {
+        this.trackRequestService.deleteTrackById(id);
+        return new ResponseEntity(id, HttpStatus.OK);
+    }
+
+    @DeleteMapping(value = "/api/deleteTrack/permalink/{permalink}")
+    public ResponseEntity<Long> deleteTrackByPermalink(@PathVariable String permalink) {
+        this.trackRequestService.deleteTrackByPermalink(permalink);
+        return new ResponseEntity(permalink, HttpStatus.OK);
+    }
 
     @GetMapping(value = "/api/getAllTracks")
     public ResponseEntity<ArrayList<Track>> getAllTracks() {
