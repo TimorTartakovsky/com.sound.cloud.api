@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service("TrackRequestService")
@@ -24,11 +25,14 @@ public class TrackRequestService {
 
     public void deleteTrackByPermalink(String permalink) {
         ArrayList<Track> tracks = this.tacksRuntimeStorage.getAllTracks();
-        tracks.forEach(track -> {
-            if (track.getPermalinkUrl() == permalink) {
-                this.trackRepository.delete(track);
-            }
-        });
+        Track toDelete = null;
+        for (Track track : tracks) {
+            toDelete = track;
+            this.trackRepository.delete(track);
+        }
+        if (toDelete != null) {
+            tracks.remove(toDelete);
+        }
     }
 
     public void addNewTrack(Track track) {
@@ -36,6 +40,9 @@ public class TrackRequestService {
     }
 
     public void deleteTrackById(Long id) {
+        Optional<Track> track = this.trackRepository.findById(id);
+        ArrayList<Track> tracks = this.tacksRuntimeStorage.getAllTracks();
+        tracks.remove(track.get());
         this.trackRepository.deleteById(id);
     }
 
