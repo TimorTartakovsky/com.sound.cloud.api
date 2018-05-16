@@ -53,11 +53,12 @@ public class TracksDataManagementController {
     // Under construction
     @PostMapping(value = "/api/addTrack")
     public ResponseEntity<ArrayList<Track>> postNewTracks(@RequestBody TrackPojo trackPojo) {
-       System.out.println("URL came ========  " + trackPojo.toString() + "  ==========");
-       ArrayList<Track> tracks = new ArrayList<>();
-       tracks.add(new Track(trackPojo.getTitle(), trackPojo.getPermalinkUrl()));
+       Track newTrack = new Track();
+       newTrack.setTitle(trackPojo.getTitle());
+       newTrack.setPermalinkUrl(trackPojo.getPermalinkUrl());
+       this.trackRequestService.addNewTrack(newTrack);
        LOGGER.info("POST /api/addTrack success");
-       return new ResponseEntity(tracks, HttpStatus.OK);
+       return new ResponseEntity(newTrack, HttpStatus.OK);
     }
 
 }

@@ -27,18 +27,15 @@ public class TrackRequestService {
         tracks.forEach(track -> {
             if (track.getPermalinkUrl() == permalink) {
                 this.trackRepository.delete(track);
-//                tracks.remove(track);
             }
         });
     }
 
+    public void addNewTrack(Track track) {
+        this.trackRepository.save(track);
+    }
+
     public void deleteTrackById(Long id) {
-//        ArrayList<Track> tracks = this.tacksRuntimeStorage.getAllTracks();
-//        tracks.forEach(track -> {
-//            if (track.getId() == id) {
-//                tracks.remove(track);
-//            }
-//        });
         this.trackRepository.deleteById(id);
     }
 
