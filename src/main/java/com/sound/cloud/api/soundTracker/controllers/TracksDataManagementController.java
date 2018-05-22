@@ -5,12 +5,15 @@ import com.sound.cloud.api.soundTracker.pojos.TrackPojo;
 import com.sound.cloud.api.soundTracker.model.Track;
 import com.sound.cloud.api.soundTracker.services.TrackRequestService;
 import com.sound.cloud.api.soundTracker.services.TracksRuntimeStorage;
+import org.hibernate.ObjectNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestClientException;
+
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -24,7 +27,7 @@ public class TracksDataManagementController {
     private TracksRuntimeStorage tracksRuntimeStorage;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TracksDataManagementController.class);
-
+    private static final String SECRET_KEY = "Secret key 777";
 
     @DeleteMapping(value = "/api/deleteTrack/id/{id}")
     public ResponseEntity<Long> deleteTrackByID(@PathVariable Long  id) {
@@ -52,9 +55,8 @@ public class TracksDataManagementController {
     }
 
     /*
-     * tracksThreeMostAndLeastLiked - Receiving TrackPojo via POST request.
-     * @Param
-     * return Array<Track>
+     * tracksThreeMostAndLeastLiked handles a POST requests from end user with JSON body containing band_name and secret_key
+     * return <ArrayList<ExpandedTrack>>
      * */
     @PostMapping(value = "/api/tracksThreeMostAndLeast")
     public ResponseEntity<ArrayList<ExpandedTrack>> tracksThreeMostAndLeastLiked(@RequestBody Map<String,String> body) {
@@ -63,6 +65,10 @@ public class TracksDataManagementController {
         return new ResponseEntity(tracks, HttpStatus.OK);
     }
 
+    /*
+    * tracksThreeMostAndLeastLiked handles a POST requests from end user with URL parameters band_name, secret_key
+    * return <ArrayList<ExpandedTrack>>
+    * */
     @PostMapping(value = "/api/tracksThreeMostAndLeast", params = {"band_name", "secret_key"})
     public ResponseEntity<ArrayList<ExpandedTrack>> tracksThreeMostAndLeastLiked(
             @RequestParam("band_name") String bandName,
@@ -72,16 +78,22 @@ public class TracksDataManagementController {
         LOGGER.info("=================== BandName: " + bandName + "  SecretKey: " + secretKey +"============================");
         return new ResponseEntity(tracks, HttpStatus.OK);
     }
-
-    private ArrayList<ExpandedTrack> handlePostRequestGetTracksByBandNameAndSecretKey(
+    /*
+    * handlePostRequestGetTracksByBandNameAndSecretKey helper function to handle request for 3 most and least liked tracks
+    * @Param String bandName - band name received from end user to search for
+    * @Param String secretKey - is need to authorize a person... )))
+    * return ArrayList<ExpandedTrack> or ObjectNotFoundException, RestClientException
+    * */
+    private ArrayList<ExpandedTrack> handlePostRequestGetTracksByBandNameAndSecretKey (
             String bandName,
             String secretKey
-    ) {
-        if (secretKey != null) {
-            return trackRequestService.getTracksByBandNameAndUserId(bandName, secretKey);
-        } else {
-            return trackRequestService.getThreeMostLikedAndThreeLeastLikedTracksByBandName(bandName);
+    ) throws ObjectNotFoundException, RestClientException {
+        if (secretKey == null || !secretKey.equals(SECRET_KEY)) {
+            throw new ObjectNotFoundException(secretKey, "secret key cannot be found.");
+        } else if (bandName == null || bandName.length() <= 1) {
+            throw new ObjectNotFoundException(bandName, "band cannot be found.");
         }
+        return trackRequestService.getThreeMostLikedAndThreeLeastLikedTracksByBandName(bandName);
     }
 
     // Under construction

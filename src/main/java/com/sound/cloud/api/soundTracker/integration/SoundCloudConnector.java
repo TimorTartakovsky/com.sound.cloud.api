@@ -29,9 +29,14 @@ public class SoundCloudConnector implements IConnector {
         restTemplate = new RestTemplate();
     }
 
+    /*
+    * getTracksByBandName connects with Sound Cloud API and fetch all the tracks related to a band.
+    * @Param String bandName
+    * return ArrayList<LinkedTreeMap<String, Object>> or RestClientException
+    * */
     @Override
     public ArrayList<LinkedTreeMap<String, Object>> getTracksByBandName(String bandName) throws RestClientException {
-        String url = BASE_SOUND_CLOUD_URL + TRACKS + bandName + LIMIT + CLIENT_ID;
+        String url = BASE_SOUND_CLOUD_URL + TRACKS + bandName + CLIENT_ID;
         String result = restTemplate.getForObject(url, String.class);
         ExpandedSearchQuery searchQuesry = new ExpandedSearchQuery(bandName, result, new Timestamp(System.currentTimeMillis()));
         this.expandedTracksSearchRepository.save(searchQuesry);

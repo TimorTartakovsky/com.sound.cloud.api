@@ -56,7 +56,11 @@ public class TrackRequestService {
         this.trackRepository.deleteById(id);
     }
 
-
+    /*
+    * getThreeMostLikedAndThreeLeastLikedTracksByBandName handles response from Sound Cloud API
+    * @Param String bandName
+    * return ArrayList<ExpandedTrack> with 3 most and least liked tracks inside or RestClientException
+    * */
     public ArrayList<ExpandedTrack > getThreeMostLikedAndThreeLeastLikedTracksByBandName(String bandName) throws RestClientException {
         ArrayList<LinkedTreeMap<String, Object>> expandedTracksArray = this.soundCloudConnector.getTracksByBandName(bandName);
         ArrayList<ExpandedTrack> myExpandedTracks = new ArrayList<>();
