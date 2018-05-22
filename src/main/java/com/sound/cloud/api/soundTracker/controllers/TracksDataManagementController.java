@@ -1,5 +1,6 @@
 package com.sound.cloud.api.soundTracker.controllers;
 
+import com.sound.cloud.api.soundTracker.model.ExpandedTrack;
 import com.sound.cloud.api.soundTracker.pojos.TrackPojo;
 import com.sound.cloud.api.soundTracker.model.Track;
 import com.sound.cloud.api.soundTracker.services.TrackRequestService;
@@ -11,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
+import java.util.Map;
 
 @RestController
 public class TracksDataManagementController {
@@ -49,6 +51,38 @@ public class TracksDataManagementController {
         return new ResponseEntity(tracks, HttpStatus.OK);
     }
 
+    /*
+     * tracksThreeMostAndLeastLiked - Receiving TrackPojo via POST request.
+     * @Param
+     * return Array<Track>
+     * */
+    @PostMapping(value = "/api/tracksThreeMostAndLeast")
+    public ResponseEntity<ArrayList<ExpandedTrack>> tracksThreeMostAndLeastLiked(@RequestBody Map<String,String> body) {
+        ArrayList<ExpandedTrack> tracks = this.handlePostRequestGetTracksByBandNameAndSecretKey(body.get("band_name"), body.get("secret_key"));
+        LOGGER.info("=================== BandName: " + body.get("band_name") + "  SecretKey: " + body.get("secret_key") + "============================");
+        return new ResponseEntity(tracks, HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/api/tracksThreeMostAndLeast", params = {"band_name", "secret_key"})
+    public ResponseEntity<ArrayList<ExpandedTrack>> tracksThreeMostAndLeastLiked(
+            @RequestParam("band_name") String bandName,
+            @RequestParam("secret_key") String secretKey
+    ) {
+        ArrayList<ExpandedTrack> tracks = this.handlePostRequestGetTracksByBandNameAndSecretKey(bandName, secretKey);
+        LOGGER.info("=================== BandName: " + bandName + "  SecretKey: " + secretKey +"============================");
+        return new ResponseEntity(tracks, HttpStatus.OK);
+    }
+
+    private ArrayList<ExpandedTrack> handlePostRequestGetTracksByBandNameAndSecretKey(
+            String bandName,
+            String secretKey
+    ) {
+        if (secretKey != null) {
+            return trackRequestService.getTracksByBandNameAndUserId(bandName, secretKey);
+        } else {
+            return trackRequestService.getThreeMostLikedAndThreeLeastLikedTracksByBandName(bandName);
+        }
+    }
 
     // Under construction
     @PostMapping(value = "/api/addTrack")
