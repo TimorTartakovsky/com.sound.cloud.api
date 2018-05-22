@@ -1,14 +1,18 @@
 package com.sound.cloud.api.soundTracker.integration;
 
+import com.google.gson.internal.LinkedTreeMap;
 import com.sound.cloud.api.soundTracker.components.ThreadBasedComponent;
+import com.sound.cloud.api.soundTracker.interfaces.ISoundCloudApiIntegration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 
+import java.util.ArrayList;
+
 @Service
-public class SoundCloudApiIntegration {
+public class SoundCloudApiIntegration implements ISoundCloudApiIntegration {
 
     @Autowired
     private TaskExecutor taskExecutor;
@@ -16,13 +20,15 @@ public class SoundCloudApiIntegration {
     @Autowired
     private ApplicationContext applicationContext;
 
-    public void initTracks() throws RestClientException {
-        ThreadBasedComponent thread1 = this.applicationContext.getBean(ThreadBasedComponent.class).setTrackName("Bee Gees");
-        ThreadBasedComponent thread2 = this.applicationContext.getBean(ThreadBasedComponent.class).setTrackName("2pac");
-        ThreadBasedComponent thread3 = this.applicationContext.getBean(ThreadBasedComponent.class).setTrackName("Michael Jackson");
+    public void initPredefinedTracks() throws RestClientException {
+        for (String band : FAVORIETS) {
+            ThreadBasedComponent thread = this.applicationContext.getBean(ThreadBasedComponent.class).setTrackName(band);
+            this.taskExecutor.execute(thread);
+        }
+    }
 
-        this.taskExecutor.execute(thread1);
-        this.taskExecutor.execute(thread2);
-        this.taskExecutor.execute(thread3);
+    @Override
+    public ArrayList<LinkedTreeMap<String, Object>> initTracks() {
+        return null;
     }
 }

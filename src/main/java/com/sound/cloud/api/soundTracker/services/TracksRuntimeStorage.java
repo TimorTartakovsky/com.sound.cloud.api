@@ -47,11 +47,12 @@ public class TracksRuntimeStorage {
             return new ArrayList<>();
         }
         ArrayList<Track> tracks = new ArrayList<>();
-        Comparator<Track> titleComparator = (Track one, Track two) -> one.getTitle().compareToIgnoreCase(two.getTitle());
+        Comparator<Track> likesCountComparator =
+                (Track one, Track two) -> Double.compare(two.getLikesCount(), one.getLikesCount());
         this.tracksMap.forEach((s, tracks1) -> {
             tracks.addAll(tracks1);
         });
-        Collections.sort(tracks, titleComparator);
+        Collections.sort(tracks, likesCountComparator);
         return tracks;
     }
 }

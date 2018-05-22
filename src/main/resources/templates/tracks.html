@@ -32,12 +32,16 @@
                             <thead class="thead-inverse">
                                 <tr>
                                     <th>ID</th>
+                                    <th>BAND</th>
+                                    <th>LIKES</th>
                                     <th>Title</th>
                                     <th>Permalink</th>
                                 </tr>
                             </thead>
                             <tr th:each="track : ${tracks}">
                                 <td th:text="${track.id}">334</td>
+                                <td th:text="${track.bandName}">334</td>
+                                <td th:text="${track.likesCount}">334</td>
                                 <td th:text="${track.title}">Hit em up</td>
                                 <td><a class="btn btn-default" href="#" th:text="${track.permalinkUrl}" th:href="${track.permalinkUrl}" role="button">Click</a></td>
                             </tr>

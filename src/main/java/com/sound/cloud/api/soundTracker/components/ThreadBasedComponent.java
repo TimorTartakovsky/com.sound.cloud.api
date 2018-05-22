@@ -43,20 +43,28 @@ public class ThreadBasedComponent implements Runnable, ISoundCloudApiIntegration
     @Override
     public void run() {
         LOGGER.info("====== Thread started request for" + this.trackName + "======");
-        ArrayList<LinkedTreeMap<String, String>> tracksArray = initTracks();
+        ArrayList<LinkedTreeMap<String, Object>> tracksArray = initTracks();
         ArrayList<Track> tracks = new ArrayList<>();
         ArrayList<User> users = new ArrayList<>();
         tracksArray.forEach(tracksObject -> {
-            Track newTrack = new Track(tracksObject.get("title"), tracksObject.get("permalink_url"));
-            User newUser = new User(tracksObject.get("avatar_url"),
-                    tracksObject.get("kind"),
-                    tracksObject.get("permalink_url"),
-                    tracksObject.get("uri"),
-                    tracksObject.get("username"),
-                    tracksObject.get("permalink"),
-                    tracksObject.get("last_modified"));
-            users.add(newUser);
-            newTrack.getUsers().add(newUser);
+            Double likes = (Double)tracksObject.get("likes_count");
+            Track newTrack = new Track(
+                    tracksObject.get("title").toString(),
+                    this.trackName,
+                    likes,
+                    tracksObject.get("permalink_url").toString());
+            LinkedTreeMap<String, Object> user = (LinkedTreeMap<String, Object>)tracksObject.get("user");
+            if (user.size() > 0) {
+                User newUser = new User(user.get("avatar_url").toString(),
+                        user.get("kind").toString(),
+                        user.get("permalink_url").toString(),
+                        user.get("uri").toString(),
+                        user.get("username").toString(),
+                        user.get("permalink").toString(),
+                        user.get("last_modified").toString());
+                users.add(newUser);
+                newTrack.getUsers().add(newUser);
+            }
             tracks.add(newTrack);
         });
         this.tracksRuntimeStorage.addTracks(this.trackName, tracks);
@@ -66,12 +74,12 @@ public class ThreadBasedComponent implements Runnable, ISoundCloudApiIntegration
     }
 
     @Override
-    public ArrayList<LinkedTreeMap<String, String>> initTracks() {
+    public ArrayList<LinkedTreeMap<String, Object>> initTracks() {
         RestTemplate restTemplate = new RestTemplate();
         String url = BASE_SOUND_CLOUD_URL + TRACKS + this.trackName + LIMIT + CLIENT_ID;
         String result = restTemplate.getForObject(url, String.class);
-        SearchQuery searchQuesry = new SearchQuery(url, new Timestamp(System.currentTimeMillis()));
-        this.searchQueryRepository.save(searchQuesry);
+        SearchQuery searchQuery = new SearchQuery(url, new Timestamp(System.currentTimeMillis()));
+        this.searchQueryRepository.save(searchQuery);
         Gson googleJson = new Gson();
         ArrayList javaArrayListFromGSON = (ArrayList<LinkedTreeMap<String, String>>) googleJson.fromJson(result, ArrayList.class);
         return javaArrayListFromGSON;

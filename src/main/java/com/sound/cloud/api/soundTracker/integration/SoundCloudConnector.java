@@ -11,7 +11,10 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 @Repository("SoundCloudConnector")
 public class SoundCloudConnector implements IConnector {
@@ -38,8 +41,14 @@ public class SoundCloudConnector implements IConnector {
     public ArrayList<LinkedTreeMap<String, Object>> getTracksByBandName(String bandName) throws RestClientException {
         String url = BASE_SOUND_CLOUD_URL + TRACKS + bandName + CLIENT_ID;
         String result = restTemplate.getForObject(url, String.class);
-        ExpandedSearchQuery searchQuesry = new ExpandedSearchQuery(bandName, result, new Timestamp(System.currentTimeMillis()));
-        this.expandedTracksSearchRepository.save(searchQuesry);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm dd/MM/yyyy");
+        try {
+            String str = dateFormat.format(new Date());
+            Date date = dateFormat.parse(str);
+            ExpandedSearchQuery searchQuesry = new ExpandedSearchQuery(bandName, result, date);
+            this.expandedTracksSearchRepository.save(searchQuesry);
+        }
+        catch (ParseException e) {}
         Gson googleJson = new Gson();
         ArrayList javaArrayListFromGSON = (ArrayList<LinkedTreeMap<String, Object>>) googleJson.fromJson(result, ArrayList.class);
         return javaArrayListFromGSON;
@@ -51,7 +60,7 @@ public class SoundCloudConnector implements IConnector {
     }
 
     @Override
-    public ArrayList<LinkedTreeMap<String, String>> initTracks() {
+    public ArrayList<LinkedTreeMap<String, Object>> initTracks() {
         return null;
     }
 }

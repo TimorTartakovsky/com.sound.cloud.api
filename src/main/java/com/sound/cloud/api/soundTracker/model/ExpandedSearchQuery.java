@@ -1,7 +1,7 @@
 package com.sound.cloud.api.soundTracker.model;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
+import java.util.Date;
 
 @Entity
 public class ExpandedSearchQuery {
@@ -12,12 +12,12 @@ public class ExpandedSearchQuery {
     private String bandName;
     @Column(name = "SOUND_CLOUD_RESULT", columnDefinition="TEXT")
     private String result;
-    private Timestamp creationDate;
+    private Date creationDate;
 
     public ExpandedSearchQuery() {
     }
 
-    public ExpandedSearchQuery(String bandName, String result, Timestamp creationDate) {
+    public ExpandedSearchQuery(String bandName, String result, Date creationDate) {
         this.bandName = bandName;
         this.result = result;
         this.creationDate = creationDate;
@@ -47,11 +47,11 @@ public class ExpandedSearchQuery {
         this.result = result;
     }
 
-    public Timestamp getCreationDate() {
+    public Date getCreationDate() {
         return creationDate;
     }
 
-    public void setCreationDate(Timestamp creationDate) {
+    public void setCreationDate(Date creationDate) {
         this.creationDate = creationDate;
     }
 }
